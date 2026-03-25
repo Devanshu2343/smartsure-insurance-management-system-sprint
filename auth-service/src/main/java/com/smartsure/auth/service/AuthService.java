@@ -1,9 +1,11 @@
 package com.smartsure.auth.service;
 
-import com.smartsure.auth.entity.User;
+import com.smartsure.auth.dto.AuthResponse;
+import com.smartsure.auth.dto.LoginRequest;
+import com.smartsure.auth.dto.RegisterRequest;
 
 public interface AuthService {
-    String register(User user);
+    void register(RegisterRequest request);
 
-    String login(String email, String password);
+    AuthResponse login(LoginRequest request);
 }

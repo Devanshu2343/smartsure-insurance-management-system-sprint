@@ -27,9 +27,9 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build and analyze
-        run: mvn clean verify sonar:sonar \
-          -Dsonar.projectKey=YOUR_PROJECT_KEY \
-          -Dsonar.organization=YOUR_ORG \
+      - name: Build + Sonar Analysis
+        run: mvn -B clean verify sonar:sonar \
+          -Dsonar.projectKey=Devanshu2343_smartsure-insurance-management-system-sprint \
+          -Dsonar.organization=Devanshu2343 \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}

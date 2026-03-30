@@ -38,6 +38,10 @@
                 ../app-it/target/site/jacoco-aggregate/jacoco.xml
             </sonar.coverage.jacoco.xmlReportPaths>
 
+
+            <sonar.organization>Devanshu2343</sonar.organization>
+            <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
     </properties>
 
     <dependencyManagement>

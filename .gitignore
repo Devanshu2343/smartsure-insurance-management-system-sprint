@@ -1,0 +1,6 @@
+node_modules/
+target/
+.idea/
+*.log
+.env
+.git/git rm -r --cached node_modules target .idea

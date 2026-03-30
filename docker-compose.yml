@@ -1,0 +1,214 @@
+services:
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - insurance-network
+
+  auth-mysql:
+    image: mysql:8.4
+    container_name: auth-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auth_db
+    volumes:
+      - auth-mysql-data:/var/lib/mysql
+    networks:
+      - insurance-network
+
+  policy-mysql:
+    image: mysql:8.4
+    container_name: policy-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: policy_db
+    volumes:
+      - policy-mysql-data:/var/lib/mysql
+    networks:
+      - insurance-network
+
+  claims-mysql:
+    image: mysql:8.4
+    container_name: claims-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: claims_db
+    volumes:
+      - claims-mysql-data:/var/lib/mysql
+    networks:
+      - insurance-network
+
+  admin-mysql:
+    image: mysql:8.4
+    container_name: admin-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: admin_db
+    volumes:
+      - admin-mysql-data:/var/lib/mysql
+    networks:
+      - insurance-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: auth-service
+    depends_on:
+      - eureka-server
+      - auth-mysql
+    environment:
+      DB_HOST: auth-mysql
+      DB_PORT: 3306
+      DB_NAME: auth_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      RABBITMQ_HOST: rabbitmq
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      JWT_SECRET: INSURANCE_MANAGEMENT_SYSTEM_JWT_SECRET_KEY_2026_SECURE_TOKEN_123456789
+      AUTH_SERVICE_URL: http://auth-service:8081
+      POLICY_SERVICE_URL: http://policy-service:8082
+    ports:
+      - "8081:8081"
+    networks:
+      - insurance-network
+
+  policy-service:
+    build:
+      context: .
+      dockerfile: policy-service/Dockerfile
+    container_name: policy-service
+    depends_on:
+      - eureka-server
+      - policy-mysql
+    environment:
+      DB_HOST: policy-mysql
+      DB_PORT: 3306
+      DB_NAME: policy_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      RABBITMQ_HOST: rabbitmq
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      JWT_SECRET: INSURANCE_MANAGEMENT_SYSTEM_JWT_SECRET_KEY_2026_SECURE_TOKEN_123456789
+      AUTH_SERVICE_URL: http://auth-service:8081
+    ports:
+      - "8082:8082"
+    networks:
+      - insurance-network
+
+  claims-service:
+    build:
+      context: .
+      dockerfile: claims-service/Dockerfile
+    container_name: claims-service
+    depends_on:
+      - eureka-server
+      - claims-mysql
+      - policy-service
+    environment:
+      DB_HOST: claims-mysql
+      DB_PORT: 3306
+      DB_NAME: claims_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      RABBITMQ_HOST: rabbitmq
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      JWT_SECRET: INSURANCE_MANAGEMENT_SYSTEM_JWT_SECRET_KEY_2026_SECURE_TOKEN_123456789
+      POLICY_SERVICE_URL: http://policy-service:8082
+      CLAIMS_SERVICE_URL: http://claims-service:8083
+    ports:
+      - "8083:8083"
+    networks:
+      - insurance-network
+
+  admin-report-service:
+    build:
+      context: .
+      dockerfile: admin-report-service/Dockerfile
+    container_name: admin-report-service
+    depends_on:
+      - eureka-server
+      - admin-mysql
+      - claims-service
+    environment:
+      DB_HOST: admin-mysql
+      DB_PORT: 3306
+      DB_NAME: admin_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      RABBITMQ_HOST: rabbitmq
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      JWT_SECRET: INSURANCE_MANAGEMENT_SYSTEM_JWT_SECRET_KEY_2026_SECURE_TOKEN_123456789
+    ports:
+      - "8084:8084"
+    networks:
+      - insurance-network
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    depends_on:
+      - eureka-server
+      - auth-service
+      - policy-service
+      - claims-service
+      - admin-report-service
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      JWT_SECRET: INSURANCE_MANAGEMENT_SYSTEM_JWT_SECRET_KEY_2026_SECURE_TOKEN_123456789
+    ports:
+      - "8080:8080"
+    networks:
+      - insurance-network
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - insurance-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - insurance-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - insurance-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - insurance-network
+
+networks:
+  insurance-network:
+    driver: bridge
+
+volumes:
+  auth-mysql-data:
+  policy-mysql-data:
+  claims-mysql-data:
+  admin-mysql-data:

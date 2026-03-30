@@ -1,6 +1,70 @@
-node_modules/
+############################
+# Java / Spring Boot
+############################
 target/
-.idea/
+*.class
+*.jar
+*.war
+*.ear
+
+############################
+# Maven
+############################
+.mvn/
+.mvn/wrapper/maven-wrapper.jar
+
+############################
+# Logs
+############################
+logs/
 *.log
+
+############################
+# IDEs
+############################
+.idea/
+.vscode/
+*.iml
+
+############################
+# OS Files
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# Environment Files
+############################
 .env
-.git/git rm -r --cached node_modules target .idea
+.env.*
+
+############################
+# Node (if frontend exists)
+############################
+node_modules/
+dist/
+build/
+
+############################
+# Docker
+############################
+*.tar
+docker-data/
+docker-volumes/
+
+############################
+# Test / Coverage
+############################
+coverage/
+*.exec
+
+############################
+# Temporary Files
+############################
+tmp/
+temp/
+
+############################
+# Git
+############################
+.git/-cached node_modules target .idea

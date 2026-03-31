@@ -1,6 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -16,7 +17,6 @@
     <packaging>pom</packaging>
 
     <name>insurance-management-system</name>
-    <description>Parent project for Insurance Management microservices system</description>
 
     <modules>
         <module>eureka-server</module>
@@ -33,15 +33,14 @@
         <maven.compiler.release>17</maven.compiler.release>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
 
+        <argLine></argLine>
 
-            <sonar.coverage.jacoco.xmlReportPaths>
-                ../app-it/target/site/jacoco-aggregate/jacoco.xml
-            </sonar.coverage.jacoco.xmlReportPaths>
-
-
-            <sonar.organization>Devanshu2343</sonar.organization>
-            <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-
+        <sonar.projectKey>Devanshu2343_smartsure-insurance-management-system-sprint</sonar.projectKey>
+        <sonar.organization>devanshu2343</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
@@ -57,48 +56,61 @@
     </dependencyManagement>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <argLine>-Dnet.bytebuddy.experimental=true -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.11</version>
                 <executions>
+
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <propertyName>argLine</propertyName>
+                            <destFile>${project.build.directory}/jacoco.exec</destFile>
+                            <append>true</append>
+                        </configuration>
                     </execution>
+
                     <execution>
                         <id>report</id>
+                        <phase>verify</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
                         <configuration>
-                            <formats>
-                                <format>XML</format>
-                            </formats>
+                            <outputDirectory>${project.build.directory}/site/jacoco-aggregate</outputDirectory>
+                            <dataFileIncludes>
+                                <dataFileInclude>**/target/jacoco.exec</dataFileInclude>
+                            </dataFileIncludes>
                         </configuration>
                     </execution>
+
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <argLine>${argLine}</argLine>
+                </configuration>
             </plugin>
 
         </plugins>
     </build>
+
 </project>

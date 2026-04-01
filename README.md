@@ -1,1 +1,1 @@
-# smartsure-insurance-management-system-sprint Backend# config-server
+# smartsure-insurance-management-system-sprint Backend

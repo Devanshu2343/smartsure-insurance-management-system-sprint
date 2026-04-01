@@ -1,9 +1,27 @@
 services:
+  config-server:
+    build:
+      context: .
+      dockerfile: config-server/Dockerfile
+    container_name: config-server
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/jhapriyanshu16/config-repo
+      SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL: main
+      SPRING_CLOUD_CONFIG_SERVER_GIT_CLONE_ON_START: "true"
+    ports:
+      - "8888:8888"
+    networks:
+      - insurance-network
+
   eureka-server:
     build:
       context: .
       dockerfile: eureka-server/Dockerfile
     container_name: eureka-server
+    depends_on:
+      - config-server
     ports:
       - "8761:8761"
     networks:

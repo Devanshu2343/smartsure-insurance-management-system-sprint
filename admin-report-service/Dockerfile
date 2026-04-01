@@ -2,6 +2,7 @@ FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /build
 
 COPY pom.xml .
+COPY config-server/pom.xml config-server/pom.xml
 COPY admin-report-service/pom.xml admin-report-service/pom.xml
 COPY eureka-server/pom.xml eureka-server/pom.xml
 COPY api-gateway/pom.xml api-gateway/pom.xml
